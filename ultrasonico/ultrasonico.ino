@@ -26,15 +26,20 @@ void loop() {
   Serial.print(",");
   Serial.println(pirState);
   
-  while (Serial.available() >= 2) {
-    char command = Serial.read();
-    char commandPIR = Serial.read();
-    controlarPIR(commandPIR);
-    controlLEDs(command);
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    if (command == "LED_ON") {
+      digitalWrite(ledF, HIGH);
+    } else if (command == "LED_OFF") {
+      digitalWrite(ledF, LOW);
+    } else {
+      // Aquí puedes manejar otros comandos, como los existentes para controlarPIR y controlLEDs
+    }
   }
 
   delay(500);
 }
+
 
 void controlarPIR(char commandPIR) {
   if (commandPIR == 'M') {
