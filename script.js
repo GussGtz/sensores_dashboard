@@ -1,3 +1,8 @@
+import serial
+import mysql.connector
+import websocket
+import threading
+import json
 $(document).ready(function () {
     // Inicializa el gráfico del sensor Ultrasonico
     function initAndUpdateChart1() {

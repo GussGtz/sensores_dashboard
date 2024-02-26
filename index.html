@@ -1,106 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Gráfica en Tiempo Real con PHP y Chart.js</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Bootstrap CSS v5.2.1 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de LED via WebSocket</title>
     <style>
-        /* Estilo para controlar el tamaño máximo de los elementos canvas */
-        .canvas-container canvas {
-            max-width: 100%;
-            height: auto;
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            background-color: #f5f5f5;
+            margin: 0;
+            color: #333;
         }
-        /* Estilo para las tarjetas para asegurar un margen interno */
-        .card {
-            margin: 10px 0;
+        .control-panel {
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.5s;
+            text-align: center;
+        }
+        /* Colores por defecto para el panel y el texto */
+        .control-panel, h2 {
+            background-color: #002244; /* Azul noche */
+            color: white;
+        }
+        button {
+            border: none;
+            border-radius: 4px;
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #led-on {
+            background-color: #28a745;
+            color: white;
+        }
+        #led-on:hover {
+            background-color: #218838;
+        }
+        #led-off {
+            background-color: #dc3545;
+            color: white;
+        }
+        #led-off:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
-
 <body>
-    <header>
-        <!-- Puedes colocar una barra de navegación aquí -->
-    </header>
-    <main class="text-center mt-4">
-        <h1>Dashboard</h1>
-        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
-            <div style="margin: 4px; width: calc(45rem - 8px);">
-                <div class="row">
-                    <div class="">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title text-center">Leds</h4>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <div class="text-center">
-                                        <img src="img/VERDE-OFF.svg" style="width: 50px; height: 50px;" alt="LED Off" class="img-fluid" id="led1">
-                                    </div>
-                                    <div class="text-center">
-                                        <img src="img/AMARILLO-OFF.svg" style="width: 50px; height: 50px;" alt="LED Off" class="img-fluid" id="led2">
-                                    </div>
-                                    <div class="text-center">
-                                        <img src="img/ROJO-OFF.svg" style="width: 50px; height: 50px;" alt="LED Off" class="img-fluid" id="led3">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="">
-                        <div class="card">
-                            <div class="card-body canvas-container">
-                                <h4 class="card-title">Sensor Ultrasonico</h4>
-                                <canvas id="sensorUltrasonico"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="margin: 4px; width: calc(45rem - 8px);">
-                <div class="row">
-                    <div class="">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title text-center">Movimientos</h4>
-                                <div class="row">
-                                    <div style="display: flex; flex-direction: column; align-items: center;">
-                                        <img src="img/sin_movimiento.svg" style="width: 50px; height: 50px;" alt="sin_movimiento" class="img-fluid" id="pirr1">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="">
-                        <div class="card">
-                            <div class="card-body canvas-container">
-                                <h4 class="card-title">Sensor Pir</h4>
-                                <canvas id="sensorPir"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-    <footer>
-        <!-- Puedes colocar un pie de página aquí -->
-    </footer>
-    <!-- Bootstrap JavaScript Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
-        crossorigin="anonymous"></script>
-    <script src="script.js"></script>
-</body>
+    <div class="control-panel" id="control-panel">
+        <h2>Control del LED</h2>
+        <button id="led-on">Encender LED</button>
+        <button id="led-off">Apagar LED</button>
+    </div>
 
+    <script>
+        const socket = new WebSocket('ws://localhost:8082');
+        const controlPanel = document.getElementById('control-panel');
+
+        socket.onopen = () => console.log("Conexión con el servidor WebSocket establecida.");
+        socket.onclose = () => console.log("La conexión WebSocket se ha cerrado.");
+        socket.onerror = error => console.log('Error en la conexión WebSocket: ${error.message}');
+        socket.onmessage = event => console.log('Mensaje del servidor: ${event.data}');
+
+        document.getElementById('led-on').addEventListener('click', () => {
+            console.log('Enviando comando para encender el LED');
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send('LED_ON');
+                controlPanel.style.backgroundColor = "#fff3cd"; // Amarillo pastel
+                controlPanel.style.color = "#856404"; // Contraste para texto
+            }
+        });
+
+        document.getElementById('led-off').addEventListener('click', () => {
+            console.log('Enviando comando para apagar el LED');
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send('LED_OFF');
+                controlPanel.style.backgroundColor = "#002244"; // Azul noche
+                controlPanel.style.color = "white"; // Contraste para texto
+            }
+        });
+    </script>
+</body>
 </html>
